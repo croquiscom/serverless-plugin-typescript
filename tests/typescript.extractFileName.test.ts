@@ -1,23 +1,24 @@
 import {extractFileNames} from '../src/typescript'
+import {ServerlessFunction} from '../src/types'
 import * as path from 'path'
 
-const functions: { [key: string]: Serverless.Function } = {
+const functions: { [key: string]: ServerlessFunction } = {
     hello: {
-        handler: 'tests/assets/hello.handler',
+        handler: 'my-folder/hello.handler',
         package: {
             include: [],
             exclude: []
         }
     },
     world: {
-        handler: 'tests/assets/world.handler',
+        handler: 'my-folder/my-subfolder/world.handler',
         package: {
             include: [],
             exclude: []
         }
     },
-    js: {
-        handler: 'tests/assets/jsfile.create',
+    create: {
+        handler: 'create.create',
         package: {
             include: [],
             exclude: []
@@ -31,9 +32,9 @@ describe('extractFileName', () => {
             extractFileNames(process.cwd(), 'aws', functions),
         ).toEqual(
             [
-                'tests/assets/hello.ts',
-                'tests/assets/world.ts',
-                'tests/assets/jsfile.js',
+                'my-folder/hello.ts',
+                'my-folder/my-subfolder/world.ts',
+                'create.ts',
             ],
         )
     })

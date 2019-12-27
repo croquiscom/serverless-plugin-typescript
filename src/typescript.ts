@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import * as fs from 'fs-extra'
 import * as _ from 'lodash'
+import { ServerlessFunction } from './types'
 import * as path from 'path'
 
 export function makeDefaultTypescriptConfig() {
@@ -8,7 +9,6 @@ export function makeDefaultTypescriptConfig() {
     preserveConstEnums: true,
     strictNullChecks: true,
     sourceMap: true,
-    allowJs: true,
     target: ts.ScriptTarget.ES5,
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     lib: ['lib.es2015.d.ts'],
@@ -18,7 +18,8 @@ export function makeDefaultTypescriptConfig() {
   return defaultTypescriptConfig
 }
 
-export function extractFileNames(cwd: string, provider: string, functions?: { [key: string]: Serverless.Function }): string[] {
+export function extractFileNames(cwd: string, provider: string, functions?: { [key: string]: ServerlessFunction }): string[] {
+
   // The Google provider will use the entrypoint not from the definition of the
   // handler function, but instead from the package.json:main field, or via a
   // index.js file. This check reads the current package.json in the same way
@@ -52,21 +53,7 @@ export function extractFileNames(cwd: string, provider: string, functions?: { [k
       const fnName = _.last(h.split('.'))
       const fnNameLastAppearanceIndex = h.lastIndexOf(fnName)
       // replace only last instance to allow the same name for file and handler
-      const fileName = h.substring(0, fnNameLastAppearanceIndex)
-
-      // Check if the .ts files exists. If so return that to watch
-      if (fs.existsSync(path.join(cwd, fileName + 'ts'))) {
-        return fileName + 'ts'
-      }
-
-      // Check if the .js files exists. If so return that to watch
-      if (fs.existsSync(path.join(cwd, fileName + 'js'))) {
-        return fileName + 'js'
-      }
-
-      // Can't find the files. Watch will have an exception anyway. So throw one with error.
-      console.log(`Cannot locate handler - ${fileName} not found`)
-      throw new Error('Typescript compilation failed. Please ensure handlers exists with ext .ts or .js')
+      return h.substring(0, fnNameLastAppearanceIndex) + 'ts'
     })
 }
 

@@ -1,7 +1,13 @@
 import * as typescript from './typescript'
+import * as ts from 'typescript'
 import { watchFile, unwatchFile, Stats} from 'fs'
+import { ServerlessOptions, ServerlessInstance, ServerlessFunction } from './types'
 
-export function watchFiles(rootFileNames: string[], originalServicePath: string, cb: () => void) {
+export function watchFiles(
+  rootFileNames: string[],
+  originalServicePath: string,
+  cb: () => void
+) {
   const tsConfig = typescript.getTypescriptConfig(originalServicePath)
   let watchedFiles = typescript.getSourceFiles(rootFileNames, tsConfig)
 
@@ -12,7 +18,7 @@ export function watchFiles(rootFileNames: string[], originalServicePath: string,
   function watchCallback(curr: Stats, prev: Stats) {
     // Check timestamp
     if (+curr.mtime <= +prev.mtime) {
-      return
+        return
     }
 
     cb()
